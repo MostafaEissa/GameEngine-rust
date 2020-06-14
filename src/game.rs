@@ -51,7 +51,8 @@ impl Game {
         })
     }
 
-    pub fn start(&mut self) {
+    pub fn start(&mut self, fps: u64) {
+
 
         //create player textures
         let texture_creator = self.renderer.texture_creator();
@@ -59,10 +60,24 @@ impl Game {
         let player_texture = surface.as_texture(&texture_creator).unwrap();
 
         while self.running() {
+
+            let start = Instant::now();
+
             self.handle_events();
             self.update();
             self.render(&player_texture);
+
+            // adjust frame rate
+            use std::time::{Instant, Duration};
+            let frame_delay = 1000/ fps ;
+            let frame_time = start.elapsed().as_millis() as u64;
+            if frame_time < frame_delay {
+                std::thread::sleep(Duration::from_millis(frame_delay - frame_time));
+            }
         }
+
+
+
     }
 
 	fn render(&mut self, player_texture: &Texture) {
