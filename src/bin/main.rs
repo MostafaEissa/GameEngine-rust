@@ -3,8 +3,13 @@ extern crate game_engine;
 
 
 fn main() {
-	let mut game = game_engine::Game::init("GameEngine", 800, 600, false).unwrap();
+	let (sdl_context, mut renderer, mut texture_creature) =  game_engine::init_sdl("GameEngine", 800, 600, false).unwrap();
+	let mut game = game_engine::Game::new(&sdl_context, &mut renderer, &mut texture_creature);
 
-	game.start(60);
+	while game.running() {
+		game.handle_events();
+		game.update();
+		game.render();
+	}
 }
 
