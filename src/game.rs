@@ -17,7 +17,7 @@ struct Graphics<'a> {
 }
 
 impl<'a> Game<'a> {
-    pub fn new(sdl_context: &'a Sdl, renderer: &'a mut Canvas<Window>, texture_creator:  &'a mut TextureCreator<WindowContext>) -> Self {
+    pub fn new(sdl_context: &'a Sdl, renderer: &'a mut Canvas<Window>, texture_creator:  &'a TextureCreator<WindowContext>) -> Self {
         
         let graphics = Graphics {
             sdl_context: sdl_context,
@@ -30,6 +30,7 @@ impl<'a> Game<'a> {
             cnt: 0,
             player: GameObject::new("assets/player.png", 0, 0),
             enemy: GameObject::new("assets/enemy.png", 50, 50),
+            map: Map::load_map(),
         };
 
         Game {
@@ -73,7 +74,8 @@ struct GameState {
 	is_running: bool,
     cnt: i32,
     player: GameObject,
-    enemy: GameObject
+    enemy: GameObject,
+    map: Map
 }
 
 impl GameState {
@@ -83,8 +85,10 @@ impl GameState {
         // clear screen
         graphics.renderer.clear();
         
-        self.player.render(&mut graphics.renderer, &mut graphics.texture_manager);
-        self.enemy.render(&mut graphics.renderer, &mut graphics.texture_manager);
+        self.map.render(graphics);
+        self.player.render(graphics);
+        self.enemy.render(graphics);
+        
 
 		// render on screen
         graphics.renderer.present();
@@ -133,10 +137,10 @@ impl GameObject {
         }
     }
 
-    fn render(&self, renderer: &mut Canvas<Window>, texture_manager: &mut TextureManager) {
+    fn render(&self, graphics: &mut Graphics) {
         // draw player
-        let texture = texture_manager.load(&self.texture);
-        renderer.copy(&texture, self.src_rect, self.dest_rect).unwrap();
+        let texture = graphics.texture_manager.load(&self.texture);
+        graphics.renderer.copy(&texture, self.src_rect, self.dest_rect).unwrap();
     }
 
     fn update(&mut self) {
@@ -167,5 +171,149 @@ impl<'a> TextureManager<'a> {
         let texture = self.texture_creator.load_texture(path).unwrap();
         self.textures.insert(path.to_string(), texture);
         self.textures.get(path).unwrap()
+    }
+}
+
+enum Tile {
+    Dirt,
+    Grass,
+    Water
+}
+
+struct Map {
+    map: [[Tile; 25]; 20],
+}
+
+impl Map {
+
+    fn load_map() -> Self {
+        use Tile::*;
+        let lvl1 = [
+            [
+            Water, Water, Water, Grass, Grass, Grass, Grass, Grass, Grass, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Grass, Grass, Grass, Dirt, Dirt, Dirt, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Grass, Grass, Grass, Dirt, Dirt, Dirt, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Grass, Grass, Dirt, Dirt, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Grass, Grass, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+            [
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
+            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
+            Water, Water, Water, Water, Water
+            ],
+        ];
+
+        Map {map: lvl1}
+    }
+
+    fn render(&self, graphics: &mut Graphics) {
+        let src = Rect::new(0, 0, 32, 32);
+        let mut dest = Rect::new(0, 0, 32, 32);
+
+        for row in 0..20 {
+            for column in 0..25 {
+                dest.set_x((column as u32 * dest.width()) as i32);
+                dest.set_y((row as u32 * dest.height()) as i32);
+
+                match self.map[row][column] {
+                    Tile::Water => Self::draw_tile(graphics, "assets/water.png", src, dest),
+                    Tile::Dirt => Self::draw_tile(graphics, "assets/dirt.png", src, dest),
+                    Tile::Grass => Self::draw_tile(graphics, "assets/grass.png", src, dest),
+                }
+            }
+        }
+    }
+
+    fn draw_tile(graphics: &mut Graphics, path: &str, src: Rect, dest: Rect) {
+        let texture  = graphics.texture_manager.load(path);
+        graphics.renderer.copy(texture, src, dest).unwrap();
     }
 }

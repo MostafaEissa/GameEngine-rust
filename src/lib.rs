@@ -6,7 +6,7 @@ use sdl2::render::{Canvas, TextureCreator};
 use sdl2::video::{Window, WindowContext};
 
 pub fn init_sdl(title: &str, width: u32, height: u32, fullscreen: bool) 
--> Result<(Sdl, Canvas<Window>, TextureCreator<WindowContext>), String> {
+    -> Result<(Sdl, Canvas<Window>, TextureCreator<WindowContext>), String> {
     
     // initialize SDL
     let sdl = sdl2::init()?;
