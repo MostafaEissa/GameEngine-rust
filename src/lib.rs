@@ -1,5 +1,6 @@
 mod game;
-pub use game::Game;
+mod ecs;
+pub use game::GameEngine;
 
 use sdl2::Sdl;
 use sdl2::render::{Canvas, TextureCreator};
