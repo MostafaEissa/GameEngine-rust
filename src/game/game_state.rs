@@ -1,51 +1,57 @@
-use crate::ecs::{EntityManager, PositionComponent};
+use crate::ecs::{EntityManager, RenderSystem, MovementSystem, Rect};
+use crate::ecs::{TextureComponent, PositionComponent, VelocityComponent};
 use super::graphics::Graphics;
 use super::map::Map;
-use super::game_object::GameObject;
 
 pub struct GameState {
     is_running: bool,
-    
-    // temp objects
-    player: GameObject,
-    enemy: GameObject,
     map: Map,
-
-    pub manager: EntityManager
+    manager: EntityManager,
+    render_system: RenderSystem,
+    movement_system: MovementSystem,
 }
 
 impl GameState {
     
     pub fn new() -> Self {
-        GameState {
+        let mut new_game = GameState {
             is_running: true,
-            player: GameObject::new("assets/player.png", 0, 0),
-            enemy: GameObject::new("assets/enemy.png", 50, 50),
             map: Map::load_map(),
-            manager: EntityManager::new(),
-        }
+            manager: EntityManager::default(),
+            render_system: RenderSystem::default(),
+            movement_system: MovementSystem::default(),
+        };
+
+        let player = new_game.manager.create_entity();
+        let texture_component = new_game.manager.add_component::<TextureComponent>(player);
+        texture_component.set_texture("assets/player.png", Rect {width: 32, height: 32}, Rect {width: 64, height: 64});
+        let position_component = new_game.manager.add_component::<PositionComponent>(player);
+        position_component.set_pos(0, 300);
+        let velocity_component = new_game.manager.add_component::<VelocityComponent>(player);
+        velocity_component.set_velocity(1, 1);
+
+        new_game
     }
 
-	pub fn render(&self, graphics: &mut Graphics) {
+	pub fn render(&mut self, graphics: &mut Graphics) {
 
         // clear screen
         graphics.renderer.clear();
         
+        // use renderer system
         self.map.render(graphics);
-        self.player.render(graphics);
-        self.enemy.render(graphics);
-        
+        self.render_system.render(graphics, &self.manager);
 
 		// render on screen
         graphics.renderer.present();
 	}
 
 	pub fn update(&mut self) {
-        self.player.update();
-        self.enemy.update();
-        self.manager.update();
-        let p = self.manager.get_entity(0).get_component::<PositionComponent>();
-        println!("{}, {}", p.x(), p.y());
+        
+        // use movement system
+        self.movement_system.update(&mut self.manager);
+
+        self.manager.refresh();
     }
 
 	pub fn handle_events(&mut self, event: sdl2::event::Event) {	

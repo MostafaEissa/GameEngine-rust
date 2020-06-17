@@ -6,3 +6,4 @@ mod map;
 mod texture_manager;
 
 pub use game_engine::GameEngine;
+pub use graphics::Graphics;

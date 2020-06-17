@@ -3,10 +3,7 @@ use sdl2::video::{Window, WindowContext};
 use sdl2::render::{Canvas, TextureCreator};
 use super::graphics::Graphics;
 use super::game_state::GameState;
-use super::game_object::GameObject;
 use super::texture_manager::TextureManager;
-use super::map::Map;
-use crate::ecs::{EntityManager, PositionComponent};
 
 
 pub struct GameEngine<'a> {
@@ -23,10 +20,7 @@ impl<'a> GameEngine<'a> {
             texture_manager: TextureManager::new(texture_creator),
         };
 
-        let mut game_state = GameState::new();
-
-        let new_player = game_state.manager.add_entity();
-        new_player.add_component::<PositionComponent>();
+        let game_state = GameState::new();
 
         GameEngine {
             graphics: graphics,

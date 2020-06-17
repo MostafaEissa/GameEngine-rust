@@ -1,8 +1,7 @@
 mod entity;
 mod component;
-mod entity_manager;
+mod system;
 
-pub use entity::Entity;
-pub use component::Component;
-pub use component::PositionComponent;
-pub use entity_manager::EntityManager;
+pub use entity::{EntityManager, EntityId};
+pub use component::{Component, PositionComponent, TextureComponent, VelocityComponent, Rect};
+pub use system::{RenderSystem, MovementSystem};
