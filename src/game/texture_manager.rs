@@ -3,14 +3,14 @@ use sdl2::video::{WindowContext};
 use sdl2::image::LoadTexture;
 use std::collections::HashMap;
 
-pub struct TextureManager<'a> {
-    texture_creator: &'a TextureCreator<WindowContext>,
-    textures: HashMap<String, Texture<'a>>
+pub struct TextureManager {
+    texture_creator: TextureCreator<WindowContext>,
+    textures: HashMap<String, Texture>
 }
 
-impl<'a> TextureManager<'a> {
+impl TextureManager {
 
-    pub fn new(texture_creator:  &'a TextureCreator<WindowContext>) -> Self {
+    pub fn new(texture_creator:  TextureCreator<WindowContext>) -> Self {
         TextureManager{texture_creator: texture_creator, textures: HashMap::new()}
     }
 

@@ -1,33 +1,29 @@
 use std::any::Any;
+use crate::math::Vector2D;
+
 pub trait Component : Any {}
 
+impl<T: 'static> Component for T {}
 
-pub struct PositionComponent {
-    xpos: i32,
-    ypos: i32
+
+pub struct TransformComponent {
+    position: Vector2D,
 }
 
-impl PositionComponent {
+impl TransformComponent {
     
-    pub fn x(&self) -> i32 {
-        self.xpos
+    pub fn position(&self) -> Vector2D {
+        self.position
     }
 
-    pub fn y(&self) -> i32 {
-        self.ypos
-    }
-
-    pub fn set_pos(&mut self, x: i32, y: i32) {
-        self.xpos = x;
-        self.ypos = y;
+    pub fn set_position(&mut self, position: Vector2D) {
+        self.position = position;
     }
 }
 
-impl Component for PositionComponent {}
-
-impl Default for PositionComponent {
+impl Default for TransformComponent {
     fn default() -> Self {
-        PositionComponent {xpos: 0, ypos: 0}
+        TransformComponent {position: Vector2D::new(0.0, 0.0)}
     }
 }
 
@@ -51,8 +47,6 @@ impl VelocityComponent {
         self.y = y;
     }
 }
-
-impl Component for VelocityComponent {}
 
 impl Default for VelocityComponent {
     fn default() -> Self {
@@ -91,8 +85,6 @@ impl TextureComponent {
         self.dest_rect
     }
 }
-
-impl Component for TextureComponent {}
 
 impl Default for TextureComponent {
     
