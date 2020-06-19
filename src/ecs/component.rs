@@ -6,11 +6,11 @@ pub trait Component : Any {}
 impl<T: 'static> Component for T {}
 
 
-pub struct TransformComponent {
+pub struct PositionComponent {
     position: Vector2D,
 }
 
-impl TransformComponent {
+impl PositionComponent {
     
     pub fn position(&self) -> Vector2D {
         self.position
@@ -21,36 +21,47 @@ impl TransformComponent {
     }
 }
 
-impl Default for TransformComponent {
+impl Default for PositionComponent {
     fn default() -> Self {
-        TransformComponent {position: Vector2D::new(0.0, 0.0)}
+        PositionComponent {position: Vector2D::new(0.0, 0.0)}
     }
 }
 
 pub struct VelocityComponent {
-    x: i32,
-    y: i32,
+    direction: Vector2D,
+    speed: f32
 }
 
 impl VelocityComponent {
     
-    pub fn x(&self) -> i32 {
-        self.x
+    pub fn direction(&self) -> Vector2D {
+        self.direction
     }
 
-    pub fn y(&self) -> i32 {
-        self.y
+    pub fn speed(&self) -> f32 {
+        self.speed
     }
 
-    pub fn set_velocity(&mut self, x: i32, y: i32) {
-        self.x = x;
-        self.y = y;
+    pub fn velocity(&self) -> Vector2D {
+        self.direction * self.speed
+    }
+
+    pub fn set_direction(&mut self, direction: Vector2D) {
+        self.direction = direction;
+    }
+    pub fn set_speed(&mut self, speed: f32) {
+        self.speed = speed;
+    }
+
+    pub fn set_velocity(&mut self, speed: f32, direction: Vector2D) {
+        self.speed = speed;
+        self.direction = direction;
     }
 }
 
 impl Default for VelocityComponent {
     fn default() -> Self {
-        VelocityComponent {x: 0, y: 0}
+        VelocityComponent {speed: 0.0, direction: Vector2D::new(0.0, 0.0)}
     }
 }
 
@@ -96,3 +107,7 @@ impl Default for TextureComponent {
         }
     }
 }
+
+
+pub type KeyboardComponent = Option<sdl2::event::Event>;
+

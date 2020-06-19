@@ -1,5 +1,7 @@
 use sdl2::EventPump;
-use crate::ecs::{World, Runnable};
+use crate::ecs::World;
+use crate::ecs::system::Runnable;
+use crate::ecs::component::*;
 
 
 pub struct GameEngine<'a> {
@@ -22,8 +24,10 @@ impl<'a> GameEngine<'a> {
             if let Some(event) = event_pump.poll_event() {
                 match event {
                     sdl2::event::Event::Quit{..} => break 'running,
-                    _ => ()
+                    _ => {*world.fetch_resource_mut::<KeyboardComponent>() = Some(event)}
                 }
+            } else {
+                *world.fetch_resource_mut::<KeyboardComponent>() = None;
             }
 
             let fps = 60;

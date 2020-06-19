@@ -1,7 +1,7 @@
 use super::component::Component;
 use std::collections::{HashMap, HashSet};
 use std::any::{Any, TypeId};
-use super::system::{Read, Write, ReadStorage, WriteStorage};
+use super::system::{Read, Write, ReadStorage, WriteStorage, ReadResource, WriteResource};
 use std::cell::{RefCell, RefMut, Ref};
 
 pub type EntityId = u64;
@@ -64,7 +64,10 @@ pub struct World {
 impl World {
 
     pub fn new() -> Self {
-        World { id: 0, entities: HashMap::new()}
+
+        let mut w = World { id: 0, entities: HashMap::new()};
+        w.create_entity();
+        w
     }
 
     pub fn create_entity(&mut self) -> EntityId {
@@ -72,6 +75,10 @@ impl World {
         self.id += 1;
         self.entities.insert(entity_id, Entity::default());
         entity_id
+    }
+
+    pub fn add_resource<T: Component + Default>(&mut self) -> RefMut<T> {
+        self.add_component(0)
     }
 
     pub fn add_component<T: Component + Default>(&mut self, entity_id: EntityId) -> RefMut<T> {
@@ -83,6 +90,18 @@ impl World {
         self.entities.get(&entity_id).map(|e| Read {
             inner: e.get_component::<T>(),
         }).unwrap()
+    }
+
+    pub fn fetch_resource<'a, T: Component>(&'a self) -> ReadResource<'a, T> {
+        ReadResource {
+            inner: self.fetch_component(0),
+        }
+    }
+
+    pub fn fetch_resource_mut<'a, T: Component>(&'a self) -> WriteResource<'a, T> {
+        WriteResource {
+            inner: self.fetch_component_mut(0),
+        }
     }
 
     pub fn fetch_all_component<'a, T: Component>(&'a self, interests: &HashSet<TypeId>) -> ReadStorage<'a, T> {

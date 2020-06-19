@@ -4,8 +4,8 @@ use sdl2::render::{Canvas, TextureCreator};
 use sdl2::rect::Rect;
 use crate::game::{Graphics, TextureManager, Map};
 
-use super::super::component::{TransformComponent, TextureComponent, VelocityComponent};
-use super::{System, ReadStorage, WriteStorage};
+use super::super::component::*;
+use super::{System, ReadStorage};
 use crate::zip;
 
 use std::collections::{HashSet};
@@ -20,7 +20,7 @@ pub struct RenderSystem {
 
 impl RenderSystem{
     pub fn new(sdl_context: Sdl, renderer: Canvas<Window>, texture_creator:  TextureCreator<WindowContext>) -> Self {
-        let vec = vec![TypeId::of::<TransformComponent>(), TypeId::of::<TextureComponent>()];
+        let vec = vec![TypeId::of::<PositionComponent>(), TypeId::of::<TextureComponent>()];
         RenderSystem {
             interests: vec.into_iter().collect(), 
             graphics:   
@@ -35,7 +35,7 @@ impl RenderSystem{
 }
 
 impl<'a> System<'a> for RenderSystem {
-    type Item = (ReadStorage<'a, TransformComponent>, ReadStorage<'a, TextureComponent>);
+    type Item = (ReadStorage<'a, PositionComponent>, ReadStorage<'a, TextureComponent>);
     fn run(&mut self, (poss, texs): Self::Item) {
         
         self.graphics.renderer.set_draw_color(sdl2::pixels::Color::WHITE);

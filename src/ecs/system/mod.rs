@@ -1,9 +1,10 @@
 mod render_system;
-mod movement_system;
+mod physics_system;
+mod keyboard_system;
 
 pub use render_system::RenderSystem;
-pub use movement_system::MovementSystem;
-
+pub use physics_system::PhysicsSystem;
+pub use keyboard_system::KeyboardSystem;
 
 use super::entity::World;
 use super::component::Component;
@@ -46,6 +47,23 @@ impl<'a, T: Component> SystemData<'a> for ReadStorage<'a, T> {
     }
 }
 
+pub struct ReadResource<'a, T> {
+    pub inner : Read<'a, T>,
+}
+
+impl<'a, T: Component> SystemData<'a> for ReadResource<'a, T> {
+    fn fetch(_interests: &HashSet<TypeId>, world: &'a World) -> Self {
+        world.fetch_resource::<T>()
+    }
+}
+
+impl<'a, T> Deref for ReadResource<'a, T> {
+    type Target = T;
+    fn deref(&self) -> &T {
+        &*self.inner
+    }
+}
+
 pub struct Write<'a, T> {
     pub inner : RefMut<'a, T>,
 }
@@ -81,6 +99,30 @@ impl<'a, T: Component> SystemData<'a> for WriteStorage<'a, T> {
         world.fetch_all_component_mut::<T>(interests)
     }
 }
+
+pub struct WriteResource<'a, T> {
+    pub inner : Write<'a, T>,
+}
+
+impl<'a, T: Component> SystemData<'a> for WriteResource<'a, T> {
+    fn fetch(_interests: &HashSet<TypeId>, world: &'a World) -> Self {
+        world.fetch_resource_mut::<T>()
+    }
+}
+
+impl<'a, T> Deref for WriteResource<'a, T> {
+    type Target = T;
+    fn deref(&self) -> &T {
+        &*self.inner
+    }
+}
+
+impl<'a, T> DerefMut for WriteResource<'a, T> {
+    fn deref_mut(&mut self) -> &mut T {
+        &mut *self.inner
+    }
+}
+
 
 impl<'a, A : SystemData<'a>, B : SystemData<'a>> SystemData<'a> for (A, B) {
     fn fetch(interests: &HashSet<TypeId>, world: &'a World) -> Self {

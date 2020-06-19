@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, AddAssign, SubAssign};
+use std::ops::{Add, Sub, AddAssign, SubAssign, Mul};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vector2D {
@@ -53,5 +53,12 @@ impl SubAssign for Vector2D {
     fn sub_assign(&mut self, other: Self) {
         self.x -= other.x;
         self.y -= other.y;
+    }
+}
+
+impl Mul<f32> for Vector2D {
+    type Output = Self;
+    fn mul(self, other: f32) -> Self {
+        Vector2D {x: self.x * other, y: self.y * other}
     }
 }
