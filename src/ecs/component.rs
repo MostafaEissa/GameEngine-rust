@@ -71,43 +71,116 @@ pub struct Rect {
     pub height: u32
 }
 
-pub struct TextureComponent {
-    texture_sheet: String,
-    src_rect: Rect,
-    dest_rect: Rect,
+impl Rect {
+    pub fn new(width: u32, height: u32) -> Self {
+        Rect {
+            width,
+            height
+        }
+    }
 }
 
-impl TextureComponent {
-    pub fn set_texture(&mut self, texture: &str, src_rect: Rect, dest_rect: Rect) {
+pub struct SpriteComponent {
+    texture_sheet: String,
+    region: Rect,
+    scale: u32,
+}
+
+impl SpriteComponent {
+    pub fn set_texture(&mut self, texture: &str) -> &mut Self{
         self.texture_sheet = texture.to_string();
-        self.src_rect = src_rect;
-        self.dest_rect = dest_rect;
+        self
     }
 
     pub fn texture(&self) -> &str {
         &self.texture_sheet
     }
 
-    pub fn src_rect(&self) -> Rect {
-        self.src_rect
+    pub fn region(&self) -> Rect {
+        self.region
     }
 
-    pub fn dest_rect(&self) -> Rect {
-        self.dest_rect
+    pub fn set_region(&mut self, region: Rect) -> &mut Self{
+        self.region = region;
+        self
+    }
+
+    pub fn scale(&self) -> u32 {
+        self.scale
+    }
+
+    pub fn set_scale(&mut self, scale: u32) -> &mut Self{
+        self.scale = scale;
+        self
     }
 }
 
-impl Default for TextureComponent {
+impl Default for SpriteComponent {
     
     fn default() -> Self {
-        TextureComponent {
+        SpriteComponent {
             texture_sheet: String::new(), 
-            src_rect: Default::default(),
-            dest_rect: Default::default(),
+            region: Default::default(),
+            scale: 1,
         }
     }
 }
 
-
 pub type KeyboardComponent = Option<sdl2::event::Event>;
 
+pub struct KeyboardControlled;
+
+impl Default for KeyboardControlled {
+    
+    fn default() -> Self {
+        KeyboardControlled
+    }
+}
+
+
+pub struct CollisionComponent {
+    width: u32,
+    height: u32,
+    tag: String
+}
+
+impl CollisionComponent {
+    pub fn width(&self) -> u32 {
+        self.width
+    } 
+
+    pub fn height(&self) -> u32 {
+        self.height
+    } 
+
+    pub fn tag(&self) -> &str {
+        &self.tag
+    } 
+
+    pub fn set_width(&mut self, width: u32) -> &mut Self {
+        self.width = width;
+        self
+    } 
+
+    pub fn set_height(&mut self, height: u32) -> &mut Self {
+        self.height = height;
+        self
+    } 
+
+    pub fn set_tag(&mut self, tag: &str) -> &mut Self {
+        self.tag = tag.to_string();
+        self
+    }
+
+}
+
+impl Default for CollisionComponent {
+    
+    fn default() -> Self {
+        CollisionComponent {
+            width: 0,
+            height: 0,
+            tag: String::new()
+        }
+    }
+}

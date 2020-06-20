@@ -8,11 +8,7 @@ use super::super::component::*;
 use super::{System, ReadStorage};
 use crate::zip;
 
-use std::collections::{HashSet};
-use std::any::TypeId;
-
 pub struct RenderSystem {
-    interests: HashSet<TypeId>,
     graphics: Graphics,
     //temp
     map: Map,
@@ -20,9 +16,7 @@ pub struct RenderSystem {
 
 impl RenderSystem{
     pub fn new(sdl_context: Sdl, renderer: Canvas<Window>, texture_creator:  TextureCreator<WindowContext>) -> Self {
-        let vec = vec![TypeId::of::<PositionComponent>(), TypeId::of::<TextureComponent>()];
         RenderSystem {
-            interests: vec.into_iter().collect(), 
             graphics:   
             Graphics {
                 sdl_context: sdl_context,
@@ -35,7 +29,7 @@ impl RenderSystem{
 }
 
 impl<'a> System<'a> for RenderSystem {
-    type Item = (ReadStorage<'a, PositionComponent>, ReadStorage<'a, TextureComponent>);
+    type Item = (ReadStorage<'a, PositionComponent>, ReadStorage<'a, SpriteComponent>);
     fn run(&mut self, (poss, texs): Self::Item) {
         
         self.graphics.renderer.set_draw_color(sdl2::pixels::Color::WHITE);
@@ -45,19 +39,15 @@ impl<'a> System<'a> for RenderSystem {
         
         for (pos, tex) in zip!(poss, texs) {
             let texture = self.graphics.texture_manager.load(tex.texture());
-            let src_rect = tex.src_rect();
-            let dest_rect = tex.dest_rect();
+            let src_rect = tex.region();
+            let scale = tex.scale();
 
             let src = Rect::new(0, 0, src_rect.width, src_rect.height);
-            let dest = Rect::new(pos.position().x() as i32 , pos.position().y() as i32, dest_rect.width, dest_rect.height);
+            let dest = Rect::new(pos.position().x() as i32 , pos.position().y() as i32, src_rect.width * scale, src_rect.height * scale);
 
             self.graphics.renderer.copy(texture, src, dest).unwrap();
         }
         
         self.graphics.renderer.present();
-    }
-
-    fn interests(&self) -> &HashSet<TypeId> {
-        &self.interests
     }
 }

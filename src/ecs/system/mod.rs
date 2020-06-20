@@ -3,8 +3,9 @@ mod physics_system;
 mod keyboard_system;
 
 pub use render_system::RenderSystem;
-pub use physics_system::PhysicsSystem;
+pub use physics_system::{PhysicsSystem, CollisionSystem};
 pub use keyboard_system::KeyboardSystem;
+
 
 use super::entity::World;
 use super::component::Component;
@@ -15,6 +16,7 @@ use std::ops::{Deref, DerefMut};
 
 pub trait SystemData<'a> {
     fn fetch(interests: &HashSet<TypeId>, world: &'a World) -> Self;
+    fn interests() -> HashSet<TypeId>;
 }
 
 pub struct Read<'a, T> {
@@ -45,6 +47,12 @@ impl<'a, T: Component> SystemData<'a> for ReadStorage<'a, T> {
     fn fetch(interests: &HashSet<TypeId>, world: &'a World) -> Self {
         world.fetch_all_component::<T>(interests)
     }
+
+    fn interests() -> HashSet<TypeId> {
+        let mut set = HashSet::new();
+        set.insert(TypeId::of::<T>());
+        set
+    }
 }
 
 pub struct ReadResource<'a, T> {
@@ -54,6 +62,10 @@ pub struct ReadResource<'a, T> {
 impl<'a, T: Component> SystemData<'a> for ReadResource<'a, T> {
     fn fetch(_interests: &HashSet<TypeId>, world: &'a World) -> Self {
         world.fetch_resource::<T>()
+    }
+
+    fn interests() -> HashSet<TypeId> {
+        HashSet::new()
     }
 }
 
@@ -98,6 +110,13 @@ impl<'a, T: Component> SystemData<'a> for WriteStorage<'a, T> {
     fn fetch(interests: &HashSet<TypeId>, world: &'a World) -> Self {
         world.fetch_all_component_mut::<T>(interests)
     }
+
+    fn interests() -> HashSet<TypeId> {
+        let mut set = HashSet::new();
+        set.insert(TypeId::of::<T>());
+        set
+    }
+
 }
 
 pub struct WriteResource<'a, T> {
@@ -107,6 +126,10 @@ pub struct WriteResource<'a, T> {
 impl<'a, T: Component> SystemData<'a> for WriteResource<'a, T> {
     fn fetch(_interests: &HashSet<TypeId>, world: &'a World) -> Self {
         world.fetch_resource_mut::<T>()
+    }
+
+    fn interests() -> HashSet<TypeId> {
+        HashSet::new()
     }
 }
 
@@ -128,18 +151,37 @@ impl<'a, A : SystemData<'a>, B : SystemData<'a>> SystemData<'a> for (A, B) {
     fn fetch(interests: &HashSet<TypeId>, world: &'a World) -> Self {
         (<A as SystemData>::fetch(interests, world), <B as SystemData>::fetch(interests, world))
     }
+
+    fn interests() -> HashSet<TypeId> {
+        let mut set = HashSet::new();
+        let s1 = <A as SystemData>::interests();
+        let s2 = <B as SystemData>::interests();
+        set.extend(s1);
+        set.extend(s2);
+        set
+    }
 }
 
 impl<'a, A : SystemData<'a>, B : SystemData<'a>,  C: SystemData<'a>> SystemData<'a> for (A, B, C) {
     fn fetch(interests: &HashSet<TypeId>, world: &'a World) -> Self {
         (<A as SystemData>::fetch(interests, world), <B as SystemData>::fetch(interests, world), <C as SystemData>::fetch(interests, world))
     }
+
+    fn interests() -> HashSet<TypeId> {
+        let mut set = HashSet::new();
+        let s1 = <A as SystemData>::interests();
+        let s2 = <B as SystemData>::interests();
+        let s3 = <C as SystemData>::interests();
+        set.extend(s1);
+        set.extend(s2);
+        set.extend(s3);
+        set
+    }
 }
 
 pub trait System<'a> {
     type Item: SystemData<'a>;
     fn run(&mut self, data: Self::Item);
-    fn interests(&self) -> &HashSet<TypeId>;
 }
 
 pub trait Runnable<'a> {
@@ -148,7 +190,7 @@ pub trait Runnable<'a> {
 
 impl<'a, T: System<'a>> Runnable<'a> for T {
     fn run(&mut self, world: &'a World) {
-        let data = T::Item::fetch(self.interests(), world);
+        let data = T::Item::fetch(&T::Item::interests(), world);
         self.run(data);
     }
 }

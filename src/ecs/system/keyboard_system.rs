@@ -1,27 +1,13 @@
 use super::super::component::*;
-use super::{System, WriteStorage, ReadResource};
-use std::collections::HashSet;
-use std::any::TypeId;
+use super::{System, WriteStorage, ReadStorage, ReadResource};
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 
-pub struct KeyboardSystem {
-    interests: HashSet<TypeId>
-    
-}
-
-impl KeyboardSystem {
-    
-    pub  fn new() -> Self {
-        let vec = vec![TypeId::of::<VelocityComponent>()];
-        let interests: HashSet<_> = vec.into_iter().collect();
-        KeyboardSystem {interests}
-    }
-}
+pub struct KeyboardSystem;
 
 impl<'a> System<'a> for KeyboardSystem {
-    type Item = (ReadResource<'a, KeyboardComponent>, WriteStorage<'a, VelocityComponent>);
-    fn run(&mut self, (evt, velocities): Self::Item) {
+    type Item = (ReadResource<'a, KeyboardComponent>, ReadStorage<'a, KeyboardControlled>, WriteStorage<'a, VelocityComponent>);
+    fn run(&mut self, (evt, _, velocities): Self::Item) {
         if let Some(ref event) = *evt {
             match event {
                 Event::KeyDown { keycode: Some(Keycode::Left), .. }  => {
@@ -83,9 +69,5 @@ impl<'a> System<'a> for KeyboardSystem {
                 _ => {}
             }
         }
-    }
-
-    fn interests(&self) -> &HashSet<TypeId> {
-        &self.interests
     }
 }
