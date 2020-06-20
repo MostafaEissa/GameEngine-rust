@@ -27,6 +27,12 @@ fn main() {
 	world.add_component::<VelocityComponent>(enemy).set_velocity(3.0, Vector2D::new(0.0, 0.0));
 	world.add_component::<CollisionComponent>(enemy).set_width(32).set_height(32).set_tag("enemy");
 
+	for tile in game_engine::game::Map::load_map("assets/p25x20.map", 25, 20) {
+		let tile_entity = world.create_entity();
+		world.add_component::<SpriteComponent>(tile_entity).set_texture(tile.texture_sheet).set_region(Rect::new(tile.width, tile.height)).set_scale(1, 1);
+		world.add_component::<PositionComponent>(tile_entity).set_position(Vector2D::new(tile.x as f32, tile.y as f32));
+		world.add_component::<VelocityComponent>(tile_entity);
+	}
 	// water tile
 	let water = world.create_entity();
 	world.add_component::<SpriteComponent>(water).set_texture("assets/water.png").set_region(Rect::new(32, 32)).set_scale(1, 1);

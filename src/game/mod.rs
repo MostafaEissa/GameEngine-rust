@@ -6,7 +6,7 @@ mod texture_manager;
 pub use game_engine::GameEngine;
 pub use graphics::Graphics;
 pub use texture_manager::TextureManager;
-pub use map::Map;
+pub use map::{Map, Tile};
 
 use sdl2::Sdl;
 use sdl2::render::{Canvas, TextureCreator};

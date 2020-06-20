@@ -1,146 +1,65 @@
-use super::graphics::Graphics;
-use sdl2::rect::Rect; 
+use std::fs::File;
+use std::io::prelude::*;
 
-enum Tile {
-    Dirt,
-    Grass,
-    Water
+
+pub struct Tile {
+    pub texture_sheet: &'static str,
+    pub width: u32,
+    pub height: u32,
+    pub x: u32,
+    pub y: u32
 }
 
-pub struct Map {
-    map: [[Tile; 25]; 20],
-}
+pub struct Map;
 
 impl Map {
 
-    pub fn load_map() -> Self {
-        use Tile::*;
-        let lvl1 = [
-            [
-            Water, Water, Water, Grass, Grass, Grass, Grass, Grass, Grass, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Grass, Grass, Grass, Dirt, Dirt, Dirt, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Grass, Grass, Grass, Dirt, Dirt, Dirt, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Grass, Grass, Dirt, Dirt, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Grass, Grass, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-            [
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water,
-            Water, Water, Water, Water, Water, Water, Water, Water, Water, Water, 
-            Water, Water, Water, Water, Water
-            ],
-        ];
+    pub fn load_map(path: &str, size_x: usize, size_y: usize) -> Vec<Tile> {
+        
+        let mut map: Vec<Tile> = vec![];
+        let mut file = File::open(path).unwrap();
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).unwrap();
 
-        Map {map: lvl1}
-    }
-
-    pub fn render(&self, graphics: &mut Graphics) {
-        let src = Rect::new(0, 0, 32, 32);
-        let mut dest = Rect::new(0, 0, 32, 32);
-
-        for row in 0..20 {
-            for column in 0..25 {
-                dest.set_x((column as u32 * dest.width()) as i32);
-                dest.set_y((row as u32 * dest.height()) as i32);
-
-                match self.map[row][column] {
-                    Tile::Water => Self::draw_tile(graphics, "assets/water.png", src, dest),
-                    Tile::Dirt => Self::draw_tile(graphics, "assets/dirt.png", src, dest),
-                    Tile::Grass => Self::draw_tile(graphics, "assets/grass.png", src, dest),
+        let rows: Vec<_> = contents.lines().collect();
+        for row in 0..size_y {
+                let tiles: Vec<_> = rows[row].split(',').collect();
+                for column in 0..size_x {
+                    let tile = tiles[column].chars().next().unwrap();
+                    match tile {
+                        '0' => {
+                            map.push(Tile {
+                                texture_sheet: "assets/water.png",
+                                width: 32,
+                                height: 32,
+                                x: column as u32 * 32,
+                                y: row as u32* 32
+                            });
+                        },
+                        '1' => {
+                            map.push(Tile {
+                                texture_sheet: "assets/grass.png",
+                                width: 32,
+                                height: 32,
+                                x: column as u32 * 32,
+                                y: row as u32* 32
+                            });
+                        },
+                        '2' => {
+                            map.push(Tile {
+                                texture_sheet: "assets/dirt.png",
+                                width: 32,
+                                height: 32,
+                                x: column as u32 * 32,
+                                y: row as u32* 32
+                            });
+                        },
+                        _ => {
+                            panic!("unkown tile type");
+                        }
+                    }
                 }
-            }
         }
-    }
-
-    fn draw_tile(graphics: &mut Graphics, path: &str, src: Rect, dest: Rect) {
-        let texture  = graphics.texture_manager.load(path);
-        graphics.renderer.copy(texture, src, dest).unwrap();
+        map
     }
 }
