@@ -3,7 +3,7 @@ extern crate game_engine;
 
 use game_engine::ecs::World;
 use game_engine::ecs::component::*;
-use game_engine::ecs::system::{RenderSystem, PhysicsSystem, CollisionSystem, KeyboardSystem};
+use game_engine::ecs::system::{RenderSystem, PhysicsSystem, KeyboardSystem};
 use game_engine::math::{Vector2D};
 
 fn main() {
@@ -33,10 +33,10 @@ fn main() {
 	// initialize systems
 	let render_system = RenderSystem::new(sdl_context, renderer, texture_creator);
 
-	dispatcher.register(render_system);
-	dispatcher.register(PhysicsSystem);
-	dispatcher.register(CollisionSystem);
+	
 	dispatcher.register(KeyboardSystem);
+	dispatcher.register(PhysicsSystem);
+	dispatcher.register(render_system);
 	
 	dispatcher.run(&mut world, event_pump);
 }

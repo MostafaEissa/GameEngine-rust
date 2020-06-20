@@ -1,44 +1,41 @@
 use super::super::component::*;
 use super::{System, ReadStorage, WriteStorage};
-use crate::zip;
 
 pub struct PhysicsSystem;
 
 impl<'a> System<'a> for PhysicsSystem {
-    type Item = (WriteStorage<'a, PositionComponent>, ReadStorage<'a, VelocityComponent>);
-    fn run(&mut self, (positions, velocities): Self::Item) {
+    type Item = (WriteStorage<'a, PositionComponent>, WriteStorage<'a, VelocityComponent>, ReadStorage<'a, CollisionComponent>);
+
+    fn run(&mut self, (positions, velocities, sprites): Self::Item) {
         
-        for (mut pos, vel) in zip!(positions, velocities) {
-            let old_pos = pos.position();
-            pos.set_position(old_pos + vel.velocity());
-        } 
-    }
-}
+        let bounding_boxes: Vec<_>= sprites.into_iter().collect();
+        let mut poss: Vec<_> = positions.into_iter().collect();
+        let mut vels: Vec<_> = velocities.into_iter().collect();
 
-pub struct CollisionSystem;
+    
+        // detect collitions
+        for (i, ((pos_a, sprite_a), vel_a)) in poss.iter().zip(bounding_boxes.iter()).zip(vels.iter_mut()).enumerate() {
+            for  (j, (pos_b, sprite_b)) in poss.iter().zip(bounding_boxes.iter()).enumerate() {
+                
+                if i == j {continue;}
 
-impl<'a> System<'a> for CollisionSystem {
-    type Item = (ReadStorage<'a, PositionComponent>, ReadStorage<'a, CollisionComponent>);
-    fn run(&mut self, (positions, sprites): Self::Item) {
+                let box_a = sdl2::rect::Rect::new(pos_a.position().x() as i32, pos_a.position().y() as i32, sprite_a.width(), sprite_a.height());
+                let box_b = sdl2::rect::Rect::new(pos_b.position().x() as i32, pos_b.position().y() as i32, sprite_b.width(), sprite_b.height());
         
-        let mut bounding_boxes  = vec![];
-        let mut tags = vec![];
-
-        for (pos, sprite) in zip!(positions, sprites) {
-            tags.push(sprite.tag().to_string());
-            bounding_boxes.push(sdl2::rect::Rect::new(pos.position().x() as i32, pos.position().y() as i32, sprite.width(), sprite.height()));
-        }  
-
-        for (i, sprite_a) in (&tags).iter().enumerate() {
-            for  (j, sprite_b) in tags[i+1..].iter().enumerate() {
-                let box_a = &bounding_boxes[i];
-                let box_b = &bounding_boxes[i+1+j];
-        
-                if CollisionDetector::aabb(box_a, box_b) {
-                    println!("Collision between {:?} and {:?}", sprite_a, sprite_b);
+                if CollisionDetector::aabb(&box_a, &box_b) {
+                    // reverse velocity of objects 
+                    let dir_a = vel_a.direction() * -1.1;
+                    vel_a.set_direction(dir_a);
                 }
             }
         }
+    
+        //update position
+        for (pos, vel) in poss.iter_mut().zip(vels.iter_mut()) {
+            let old_pos = pos.position();
+            pos.set_position(old_pos + vel.velocity());
+        }
+        
     }
 }
 
