@@ -14,7 +14,7 @@ impl<'a> System<'a> for PhysicsSystem {
 
     
         // detect collitions
-        for (i, ((pos_a, sprite_a), vel_a)) in poss.iter().zip(bounding_boxes.iter()).zip(vels.iter_mut()).enumerate() {
+        for (i, ((pos_a, sprite_a), _vel_a)) in poss.iter().zip(bounding_boxes.iter()).zip(vels.iter_mut()).enumerate() {
             for  (j, (pos_b, sprite_b)) in poss.iter().zip(bounding_boxes.iter()).enumerate() {
                 
                 if i == j {continue;}
@@ -23,9 +23,7 @@ impl<'a> System<'a> for PhysicsSystem {
                 let box_b = sdl2::rect::Rect::new(pos_b.position().x() as i32, pos_b.position().y() as i32, sprite_b.width(), sprite_b.height());
         
                 if CollisionDetector::aabb(&box_a, &box_b) {
-                    // reverse velocity of objects 
-                    let dir_a = vel_a.direction() * -1.1;
-                    vel_a.set_direction(dir_a);
+                    println!("collision between {} and {}", sprite_a.tag(), sprite_b.tag());
                 }
             }
         }

@@ -83,7 +83,8 @@ impl Rect {
 pub struct SpriteComponent {
     texture_sheet: String,
     region: Rect,
-    scale: u32,
+    scale_x: u32,
+    scale_y: u32,
 }
 
 impl SpriteComponent {
@@ -105,12 +106,13 @@ impl SpriteComponent {
         self
     }
 
-    pub fn scale(&self) -> u32 {
-        self.scale
+    pub fn scale(&self) -> (u32, u32) {
+        (self.scale_x, self.scale_y)
     }
 
-    pub fn set_scale(&mut self, scale: u32) -> &mut Self{
-        self.scale = scale;
+    pub fn set_scale(&mut self, scale_x: u32, scale_y: u32) -> &mut Self{
+        self.scale_x = scale_x;
+        self.scale_y = scale_y;
         self
     }
 }
@@ -121,7 +123,8 @@ impl Default for SpriteComponent {
         SpriteComponent {
             texture_sheet: String::new(), 
             region: Default::default(),
-            scale: 1,
+            scale_x: 1,
+            scale_y: 1
         }
     }
 }
