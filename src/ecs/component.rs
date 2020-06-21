@@ -90,6 +90,8 @@ pub struct SpriteComponent {
     region: Rect,
     scale_x: u32,
     scale_y: u32,
+    flip_horizontal: bool,
+    flip_vertical: bool,
 }
 
 impl SpriteComponent {
@@ -110,14 +112,19 @@ impl SpriteComponent {
         self.layer
     }
 
+    pub fn scale(&self) -> (u32, u32) {
+        (self.scale_x, self.scale_y)
+    }
+
+    pub fn flip(&self) -> (bool, bool) {
+        (self.flip_horizontal, self.flip_vertical)
+    }
+
     pub fn set_region(&mut self, region: Rect) -> &mut Self{
         self.region = region;
         self
     }
 
-    pub fn scale(&self) -> (u32, u32) {
-        (self.scale_x, self.scale_y)
-    }
 
     pub fn set_scale(&mut self, scale_x: u32, scale_y: u32) -> &mut Self{
         self.scale_x = scale_x;
@@ -127,6 +134,12 @@ impl SpriteComponent {
 
     pub fn set_layer(&mut self, layer: u32) -> &mut Self {
         self.layer = layer;
+        self
+    }
+
+    pub fn set_flip(&mut self, horizontal: bool, vertical: bool) -> &mut Self {
+        self.flip_horizontal = horizontal;
+        self.flip_vertical = vertical;
         self
     }
 }
@@ -139,32 +152,36 @@ impl Default for SpriteComponent {
             region: Default::default(),
             scale_x: 1,
             scale_y: 1,
-            layer: 0
+            layer: 0,
+            flip_horizontal: false,
+            flip_vertical: false,
         }
     }
 }
 
-pub struct AnimationComponent {
+pub struct AnimationData {
     frames: u32,
-    speed: u32
+    speed: u32,
+    index: u32,
+    flip_horizontal: bool,
+    flip_vertical: bool,
 }
 
-impl Default for AnimationComponent {
-    fn default() -> Self {
-        AnimationComponent {
-            frames : 0,
-            speed : 100
-        }
-    }
-}
-
-impl AnimationComponent {
+impl AnimationData {
     pub fn frames(&self) -> u32 {
         self.frames
     }
 
     pub fn speed(&self) -> u32 {
         self.speed
+    }
+
+    pub fn index(&self) -> u32 {
+        self.index
+    }
+
+    pub fn flip(&self) -> (bool, bool) {
+        (self.flip_horizontal, self.flip_vertical)
     }
 
     pub fn set_frames(&mut self, frames: u32) -> &mut Self {
@@ -175,6 +192,59 @@ impl AnimationComponent {
     pub fn set_speed(&mut self, speed: u32) -> &mut Self {
         self.speed = speed;
         self
+    }
+
+    pub fn set_index(&mut self, index: u32) -> &mut Self {
+        self.index = index;
+        self
+    }
+
+    pub fn set_flip(&mut self, horizontal: bool, vertical: bool) -> &mut Self {
+        self.flip_horizontal = horizontal;
+        self.flip_vertical = vertical;
+        self
+    }
+}
+
+
+pub struct AnimationComponent {
+    animations: std::collections::HashMap<String, AnimationData>,
+    active_animation: String
+}
+
+impl Default for AnimationComponent {
+    fn default() -> Self {
+        AnimationComponent {
+            animations: std::collections::HashMap::new(),
+            active_animation: String::new(),
+        }
+    }
+}
+
+impl AnimationComponent {
+    
+    pub fn play(&mut self, animation: &str, flip_horizontal: bool, flip_vertical: bool) {
+        self.active_animation = animation.to_string();
+        self.get_animation_mut(animation).set_flip(flip_horizontal, flip_vertical);
+    }
+
+    pub fn animation(&self) -> &AnimationData {
+        self.animations.get(&self.active_animation).unwrap()
+    }
+
+    pub fn add_animation(&mut self, animation: &str, index: u32, frames: u32, speed: u32) -> &mut Self {
+        self.animations.insert(animation.to_string(), AnimationData {
+            index,
+            frames,
+            speed,
+            flip_horizontal: false,
+            flip_vertical: false,
+        });
+        self
+    }
+
+    pub fn get_animation_mut(&mut self, animation: &str) -> &mut AnimationData {
+        self.animations.get_mut(animation).unwrap()
     }
 }
 

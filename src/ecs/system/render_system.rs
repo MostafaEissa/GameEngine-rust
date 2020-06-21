@@ -43,7 +43,7 @@ impl<'a> System<'a> for RenderSystem {
             let src = Rect::new(src_rect.x, src_rect.y, src_rect.width, src_rect.height);
             let dest = Rect::new(pos.position().x() as i32 , pos.position().y() as i32, src_rect.width * scale_x, src_rect.height * scale_y);
 
-            self.graphics.renderer.copy(texture, src, dest).unwrap();
+            self.graphics.renderer.copy_ex(texture, src, dest, 0.0, None, tex.flip().0, tex.flip().1).unwrap();
         }
         
         self.graphics.renderer.present();
@@ -56,11 +56,14 @@ impl<'a> System<'a> for AnimationSystem {
     type Item = (ReadResource<'a, Ticks>, ReadStorage<'a, AnimationComponent>, WriteStorage<'a, SpriteComponent>);
     fn run(&mut self, (ticks, animations, sprites): Self::Item) {
 
-        for (animation, mut sprite) in zip!(animations, sprites) {
+        for (animator, mut sprite) in zip!(animations, sprites) {
             let mut region = sprite.region();
+            let animation = animator.animation();
 
+            region.y = (animation.index() * region.height) as i32;
             region.x = ((region.width as u64) * (((*ticks) / (animation.speed() as u64)) % (animation.frames() as u64))) as i32;
             sprite.set_region(region);
+            sprite.set_flip(animation.flip().0, animation.flip().1);
         }
     }
 }

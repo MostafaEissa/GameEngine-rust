@@ -18,12 +18,21 @@ fn main() {
 
 	// create player
 	let player = world.create_entity();
-	world.add_component::<SpriteComponent>(player).set_texture("assets/player_idle.png").set_layer(PLAYER_LAYER).set_region(Rect::new(32, 32)).set_scale(2, 2);
+	world.add_component::<SpriteComponent>(player)
+	.set_texture("assets/player_anims.png")
+	.set_layer(PLAYER_LAYER)
+	.set_region(Rect::new(32, 32))
+	.set_scale(2, 2);
+
 	world.add_component::<PositionComponent>(player).set_position(Vector2D::new(0.0, 300.0));
 	world.add_component::<VelocityComponent>(player).set_velocity(3.0, Vector2D::new(0.0, 0.0));
 	world.add_component::<KeyboardControlled>(player);
 	world.add_component::<CollisionComponent>(player).set_width(32).set_height(32).set_tag("player");
-	world.add_component::<AnimationComponent>(player).set_frames(4).set_speed(100);
+
+	world.add_component::<AnimationComponent>(player)
+	.add_animation("Idle", 0, 4, 100)
+	.add_animation("Walk", 1, 8, 100)
+	.play("Idle", false, false);
 
 	//create enemy
 	let enemy = world.create_entity();

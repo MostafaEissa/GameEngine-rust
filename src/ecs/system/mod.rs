@@ -180,6 +180,25 @@ impl<'a, A : SystemData<'a>, B : SystemData<'a>,  C: SystemData<'a>> SystemData<
     }
 }
 
+impl<'a, A : SystemData<'a>, B : SystemData<'a>,  C: SystemData<'a>, D: SystemData<'a>> SystemData<'a> for (A, B, C, D) {
+    fn fetch(interests: &HashSet<TypeId>, world: &'a World) -> Self {
+        (<A as SystemData>::fetch(interests, world), <B as SystemData>::fetch(interests, world), <C as SystemData>::fetch(interests, world), <D as SystemData>::fetch(interests, world))
+    }
+
+    fn interests() -> HashSet<TypeId> {
+        let mut set = HashSet::new();
+        let s1 = <A as SystemData>::interests();
+        let s2 = <B as SystemData>::interests();
+        let s3 = <C as SystemData>::interests();
+        let s4 = <D as SystemData>::interests();
+        set.extend(s1);
+        set.extend(s2);
+        set.extend(s3);
+        set.extend(s4);
+        set
+    }
+}
+
 pub trait System<'a> {
     type Item: SystemData<'a>;
     fn run(&mut self, data: Self::Item);
