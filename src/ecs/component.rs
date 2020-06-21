@@ -68,20 +68,25 @@ impl Default for VelocityComponent {
 #[derive(Clone, Copy, Default)]
 pub struct Rect {
     pub width: u32,
-    pub height: u32
+    pub height: u32,
+    pub x: i32,
+    pub y: i32
 }
 
 impl Rect {
     pub fn new(width: u32, height: u32) -> Self {
         Rect {
             width,
-            height
+            height,
+            x: 0,
+            y: 0
         }
     }
 }
 
 pub struct SpriteComponent {
     texture_sheet: String,
+    layer: u32,
     region: Rect,
     scale_x: u32,
     scale_y: u32,
@@ -101,6 +106,10 @@ impl SpriteComponent {
         self.region
     }
 
+    pub fn layer(&self) -> u32 {
+        self.layer
+    }
+
     pub fn set_region(&mut self, region: Rect) -> &mut Self{
         self.region = region;
         self
@@ -115,6 +124,11 @@ impl SpriteComponent {
         self.scale_y = scale_y;
         self
     }
+
+    pub fn set_layer(&mut self, layer: u32) -> &mut Self {
+        self.layer = layer;
+        self
+    }
 }
 
 impl Default for SpriteComponent {
@@ -124,10 +138,12 @@ impl Default for SpriteComponent {
             texture_sheet: String::new(), 
             region: Default::default(),
             scale_x: 1,
-            scale_y: 1
+            scale_y: 1,
+            layer: 0
         }
     }
 }
+
 
 pub type KeyboardComponent = Option<sdl2::event::Event>;
 
@@ -139,7 +155,6 @@ impl Default for KeyboardControlled {
         KeyboardControlled
     }
 }
-
 
 pub struct CollisionComponent {
     width: u32,

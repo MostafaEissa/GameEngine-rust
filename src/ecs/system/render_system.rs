@@ -31,13 +31,16 @@ impl<'a> System<'a> for RenderSystem {
         
         self.graphics.renderer.set_draw_color(sdl2::pixels::Color::WHITE);
         self.graphics.renderer.clear();
-        
-        for (pos, tex) in zip!(poss, texs) {
+
+        let mut renderables: Vec<_> = zip!(poss, texs).collect();
+        renderables.sort_by_key(|item| item.1.layer());
+
+        for (pos, tex) in renderables {
             let texture = self.graphics.texture_manager.load(tex.texture());
             let src_rect = tex.region();
             let (scale_x, scale_y) = tex.scale();
 
-            let src = Rect::new(0, 0, src_rect.width, src_rect.height);
+            let src = Rect::new(src_rect.x, src_rect.y, src_rect.width, src_rect.height);
             let dest = Rect::new(pos.position().x() as i32 , pos.position().y() as i32, src_rect.width * scale_x, src_rect.height * scale_y);
 
             self.graphics.renderer.copy(texture, src, dest).unwrap();
