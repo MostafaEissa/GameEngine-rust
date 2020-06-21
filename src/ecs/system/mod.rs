@@ -3,6 +3,7 @@ mod physics_system;
 mod keyboard_system;
 
 pub use render_system::RenderSystem;
+pub use render_system::AnimationSystem;
 pub use physics_system::PhysicsSystem;
 pub use keyboard_system::KeyboardSystem;
 

@@ -5,7 +5,7 @@ use sdl2::rect::Rect;
 use crate::game::{Graphics, TextureManager};
 
 use super::super::component::*;
-use super::{System, ReadStorage};
+use super::{System, ReadStorage, WriteStorage, ReadResource};
 use crate::zip;
 
 pub struct RenderSystem {
@@ -47,5 +47,20 @@ impl<'a> System<'a> for RenderSystem {
         }
         
         self.graphics.renderer.present();
+    }
+}
+
+pub struct AnimationSystem;
+
+impl<'a> System<'a> for AnimationSystem {
+    type Item = (ReadResource<'a, Ticks>, ReadStorage<'a, AnimationComponent>, WriteStorage<'a, SpriteComponent>);
+    fn run(&mut self, (ticks, animations, sprites): Self::Item) {
+
+        for (animation, mut sprite) in zip!(animations, sprites) {
+            let mut region = sprite.region();
+
+            region.x = ((region.width as u64) * (((*ticks) / (animation.speed() as u64)) % (animation.frames() as u64))) as i32;
+            sprite.set_region(region);
+        }
     }
 }

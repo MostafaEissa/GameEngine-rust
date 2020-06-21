@@ -3,7 +3,7 @@ extern crate game_engine;
 
 use game_engine::ecs::World;
 use game_engine::ecs::component::*;
-use game_engine::ecs::system::{RenderSystem, PhysicsSystem, KeyboardSystem};
+use game_engine::ecs::system::{RenderSystem, AnimationSystem, PhysicsSystem, KeyboardSystem};
 use game_engine::math::{Vector2D};
 
 fn main() {
@@ -23,6 +23,7 @@ fn main() {
 	world.add_component::<VelocityComponent>(player).set_velocity(3.0, Vector2D::new(0.0, 0.0));
 	world.add_component::<KeyboardControlled>(player);
 	world.add_component::<CollisionComponent>(player).set_width(32).set_height(32).set_tag("player");
+	world.add_component::<AnimationComponent>(player).set_frames(4).set_speed(100);
 
 	//create enemy
 	let enemy = world.create_entity();
@@ -40,13 +41,15 @@ fn main() {
 	
 	// keyboard resource
 	world.add_resource::<KeyboardComponent>();
-	
+	world.add_resource::<Ticks>();
+
 	// initialize systems
 	let render_system = RenderSystem::new(sdl_context, renderer, texture_creator);
 
 	
 	dispatcher.register(KeyboardSystem);
 	dispatcher.register(PhysicsSystem);
+	dispatcher.register(AnimationSystem);
 	dispatcher.register(render_system);
 	
 	dispatcher.run(&mut world, event_pump);

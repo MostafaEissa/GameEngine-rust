@@ -144,6 +144,39 @@ impl Default for SpriteComponent {
     }
 }
 
+pub struct AnimationComponent {
+    frames: u32,
+    speed: u32
+}
+
+impl Default for AnimationComponent {
+    fn default() -> Self {
+        AnimationComponent {
+            frames : 0,
+            speed : 100
+        }
+    }
+}
+
+impl AnimationComponent {
+    pub fn frames(&self) -> u32 {
+        self.frames
+    }
+
+    pub fn speed(&self) -> u32 {
+        self.speed
+    }
+
+    pub fn set_frames(&mut self, frames: u32) -> &mut Self {
+        self.frames = frames;
+        self
+    }
+
+    pub fn set_speed(&mut self, speed: u32) -> &mut Self {
+        self.speed = speed;
+        self
+    }
+}
 
 pub type KeyboardComponent = Option<sdl2::event::Event>;
 
@@ -155,6 +188,8 @@ impl Default for KeyboardControlled {
         KeyboardControlled
     }
 }
+
+pub type Ticks = u64;
 
 pub struct CollisionComponent {
     width: u32,

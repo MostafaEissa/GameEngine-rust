@@ -6,12 +6,13 @@ use crate::ecs::component::*;
 
 pub struct GameEngine<'a> {
     systems: Vec<Box<dyn Runnable<'a>>>,
+    start: std::time::Instant,
 }
 
 impl<'a> GameEngine<'a> {
 
     pub fn new() -> Self {
-        GameEngine { systems: vec![]}
+        GameEngine { systems: vec![], start: std::time::Instant::now()}
     }
 
     pub fn register<T:'static + Runnable<'a>>(&mut self, system: T) {
@@ -44,6 +45,8 @@ impl<'a> GameEngine<'a> {
             if frame_time < frame_delay {
                 std::thread::sleep(Duration::from_millis(frame_delay - frame_time));
             }
+
+            *world.fetch_resource_mut::<Ticks>() =  self.start.elapsed().as_millis() as u64;
 
         }
     }
