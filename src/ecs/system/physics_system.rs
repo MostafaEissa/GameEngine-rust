@@ -4,13 +4,15 @@ use super::{System, ReadStorage, WriteStorage};
 pub struct PhysicsSystem;
 
 impl<'a> System<'a> for PhysicsSystem {
-    type Item = (WriteStorage<'a, PositionComponent>, WriteStorage<'a, VelocityComponent>, ReadStorage<'a, CollisionComponent>);
+    type Item = (WriteStorage<'a, PositionComponent>, WriteStorage<'a, VelocityComponent>, 
+    ReadStorage<'a, CollisionComponent>, ReadStorage<'a, SpriteComponent>);
 
-    fn run(&mut self, (positions, velocities, sprites): Self::Item) {
+    fn run(&mut self, (positions, velocities, sprites, texx): Self::Item) {
         
         let bounding_boxes: Vec<_>= sprites.into_iter().collect();
         let mut poss: Vec<_> = positions.into_iter().collect();
         let mut vels: Vec<_> = velocities.into_iter().collect();
+        let texs: Vec<_> = texx.into_iter().collect();
 
     
         // detect collitions
@@ -29,9 +31,16 @@ impl<'a> System<'a> for PhysicsSystem {
         }
     
         //update position
-        for (pos, vel) in poss.iter_mut().zip(vels.iter_mut()) {
-            let old_pos = pos.position();
-            pos.set_position(old_pos + vel.velocity());
+        let player = poss.iter_mut().zip(vels.iter_mut()).zip(texs.iter()).filter(
+            |item| item.1.layer() == 1
+        ).nth(0).unwrap();
+        let velocity = (player.0).1.velocity();
+
+        for ((pos, _), tex) in poss.iter_mut().zip(vels.iter_mut()).zip(texs.iter()) {
+            if tex.layer() == 0 {
+                let old_pos = pos.position();
+                pos.set_position(old_pos - velocity);
+            }
         }
         
     }

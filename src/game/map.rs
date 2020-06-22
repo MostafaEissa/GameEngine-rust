@@ -30,8 +30,8 @@ impl Map {
                     map.push(Tile {
                         texture_sheet: "assets/terrain_ss.png",
                         src_rect: sdl2::rect::Rect::new(x * 32, y * 32, 32, 32),
-                        pos_x: column as u32 * 32,
-                        pos_y: row as u32* 32
+                        pos_x: column as u32 * 64,
+                        pos_y: row as u32* 64
                     });
                 }
         }

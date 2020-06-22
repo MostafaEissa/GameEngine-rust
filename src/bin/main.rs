@@ -24,7 +24,7 @@ fn main() {
 	.set_region(Rect::new(0, 0, 32, 32))
 	.set_scale(4, 4);
 
-	world.add_component::<PositionComponent>(player).set_position(Vector2D::new(0.0, 300.0));
+	world.add_component::<PositionComponent>(player).set_position(Vector2D::new(400.0, 320.0));
 	world.add_component::<VelocityComponent>(player).set_velocity(3.0, Vector2D::new(0.0, 0.0));
 	world.add_component::<KeyboardControlled>(player);
 	world.add_component::<CollisionComponent>(player).set_width(32).set_height(32).set_tag("player");
@@ -39,6 +39,7 @@ fn main() {
 		world.add_component::<SpriteComponent>(tile_entity).set_texture(tile.texture_sheet).set_layer(MAP_LAYER).set_region(tile.src_rect).set_scale(2, 2);
 		world.add_component::<PositionComponent>(tile_entity).set_position(Vector2D::new(tile.pos_x as f32, tile.pos_y as f32));
 		world.add_component::<VelocityComponent>(tile_entity);
+		world.add_component::<CollisionComponent>(tile_entity).set_width(0).set_height(0).set_tag("map");
 	}
 	
 	// keyboard resource
