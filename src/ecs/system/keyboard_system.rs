@@ -7,8 +7,8 @@ use crate::zip;
 pub struct KeyboardSystem;
 
 impl<'a> System<'a> for KeyboardSystem {
-    type Item = (ReadResource<'a, KeyboardComponent>, ReadStorage<'a, KeyboardControlled>, WriteStorage<'a, VelocityComponent>, WriteStorage<'a, AnimationComponent>);
-    fn run(&mut self, (evt, _, velocities, animators): Self::Item) {
+    type Item = (ReadResource<'a, KeyboardComponent>,  ReadStorage<'a, KeyboardControlled>, WriteStorage<'a, VelocityComponent>, WriteStorage<'a, AnimationComponent>);
+    fn run(&mut self, (evt,  _, velocities, animators): Self::Item) {
         if let Some(ref event) = *evt {
             match event {
                 Event::KeyDown { keycode: Some(Keycode::Left), .. }  => {

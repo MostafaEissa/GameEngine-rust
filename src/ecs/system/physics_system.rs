@@ -1,18 +1,16 @@
 use super::super::component::*;
-use super::{System, ReadStorage, WriteStorage};
+use super::{System, ReadStorage, WriteStorage, WriteResource};
 
 pub struct PhysicsSystem;
 
 impl<'a> System<'a> for PhysicsSystem {
-    type Item = (WriteStorage<'a, PositionComponent>, WriteStorage<'a, VelocityComponent>, 
-    ReadStorage<'a, CollisionComponent>, ReadStorage<'a, SpriteComponent>);
+    type Item = (WriteResource<'a, Camera>, WriteStorage<'a, PositionComponent>, WriteStorage<'a, VelocityComponent>, ReadStorage<'a, CollisionComponent>);
 
-    fn run(&mut self, (positions, velocities, sprites, texx): Self::Item) {
+    fn run(&mut self, (mut camera, positions, velocities, sprites): Self::Item) {
         
         let bounding_boxes: Vec<_>= sprites.into_iter().collect();
         let mut poss: Vec<_> = positions.into_iter().collect();
         let mut vels: Vec<_> = velocities.into_iter().collect();
-        let texs: Vec<_> = texx.into_iter().collect();
 
     
         // detect collitions
@@ -31,16 +29,26 @@ impl<'a> System<'a> for PhysicsSystem {
         }
     
         //update position
-        let player = poss.iter_mut().zip(vels.iter_mut()).zip(texs.iter()).filter(
-            |item| item.1.layer() == 1
-        ).nth(0).unwrap();
-        let velocity = (player.0).1.velocity();
 
-        for ((pos, _), tex) in poss.iter_mut().zip(vels.iter_mut()).zip(texs.iter()) {
-            if tex.layer() == 0 {
+        for (pos, vel) in poss.iter_mut().zip(vels.iter_mut()) {
                 let old_pos = pos.position();
-                pos.set_position(old_pos - velocity);
-            }
+                pos.set_position(old_pos + vel.velocity());
+
+                camera.x = pos.position().x() as i32 - 400;
+                camera.y = pos.position().y() as i32 - 320;
+                if camera.x < 0 {
+                    camera.x = 0;
+                }
+                if camera.y < 0 {
+                    camera.y = 0;
+                }
+                if camera.x > camera.w as i32{
+                    camera.x = camera.w as i32;
+                }
+                if camera.y > camera.h as i32 {
+                    camera.y = camera.h as i32;
+                }
+            
         }
         
     }

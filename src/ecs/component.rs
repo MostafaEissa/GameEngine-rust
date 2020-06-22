@@ -242,6 +242,25 @@ impl Default for KeyboardControlled {
 
 pub type Ticks = u64;
 
+#[derive(Debug, Copy, Clone)]
+pub struct Camera {
+    pub w: u32, 
+    pub h: u32,
+    pub x: i32,
+    pub y: i32,
+}
+
+impl Default for Camera {
+    fn default() -> Self {
+        Camera {
+            w: 800,
+            h: 640,
+            x: 0,
+            y: 0
+        }
+    }
+}
+
 pub struct CollisionComponent {
     width: u32,
     height: u32,

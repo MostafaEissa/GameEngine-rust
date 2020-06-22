@@ -48,6 +48,7 @@ impl<'a> GameEngine<'a> {
 
             *world.fetch_resource_mut::<Ticks>() =  self.start.elapsed().as_millis() as u64;
 
+
         }
     }
 }

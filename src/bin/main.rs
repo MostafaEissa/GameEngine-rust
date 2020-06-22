@@ -39,12 +39,12 @@ fn main() {
 		world.add_component::<SpriteComponent>(tile_entity).set_texture(tile.texture_sheet).set_layer(MAP_LAYER).set_region(tile.src_rect).set_scale(2, 2);
 		world.add_component::<PositionComponent>(tile_entity).set_position(Vector2D::new(tile.pos_x as f32, tile.pos_y as f32));
 		world.add_component::<VelocityComponent>(tile_entity);
-		world.add_component::<CollisionComponent>(tile_entity).set_width(0).set_height(0).set_tag("map");
 	}
 	
 	// keyboard resource
 	world.add_resource::<KeyboardComponent>();
 	world.add_resource::<Ticks>();
+	world.add_resource::<Camera>();
 
 	// initialize systems
 	let render_system = RenderSystem::new(sdl_context, renderer, texture_creator);
