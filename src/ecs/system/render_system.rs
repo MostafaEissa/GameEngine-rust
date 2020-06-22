@@ -40,10 +40,9 @@ impl<'a> System<'a> for RenderSystem {
             let src_rect = tex.region();
             let (scale_x, scale_y) = tex.scale();
 
-            let src = Rect::new(src_rect.x, src_rect.y, src_rect.width, src_rect.height);
-            let dest = Rect::new(pos.position().x() as i32 , pos.position().y() as i32, src_rect.width * scale_x, src_rect.height * scale_y);
+            let dest = Rect::new(pos.position().x() as i32 , pos.position().y() as i32, src_rect.w as u32 * scale_x, src_rect.h as u32 * scale_y);
 
-            self.graphics.renderer.copy_ex(texture, src, dest, 0.0, None, tex.flip().0, tex.flip().1).unwrap();
+            self.graphics.renderer.copy_ex(texture, src_rect, dest, 0.0, None, tex.flip().0, tex.flip().1).unwrap();
         }
         
         self.graphics.renderer.present();
@@ -60,8 +59,8 @@ impl<'a> System<'a> for AnimationSystem {
             let mut region = sprite.region();
             let animation = animator.animation();
 
-            region.y = (animation.index() * region.height) as i32;
-            region.x = ((region.width as u64) * (((*ticks) / (animation.speed() as u64)) % (animation.frames() as u64))) as i32;
+            region.y = (animation.index() * region.h as u32) as i32;
+            region.x = ((region.w as u64) * (((*ticks) / (animation.speed() as u64)) % (animation.frames() as u64))) as i32;
             sprite.set_region(region);
             sprite.set_flip(animation.flip().0, animation.flip().1);
         }

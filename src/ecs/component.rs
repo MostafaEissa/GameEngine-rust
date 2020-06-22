@@ -65,29 +65,10 @@ impl Default for VelocityComponent {
     }
 }
 
-#[derive(Clone, Copy, Default)]
-pub struct Rect {
-    pub width: u32,
-    pub height: u32,
-    pub x: i32,
-    pub y: i32
-}
-
-impl Rect {
-    pub fn new(width: u32, height: u32) -> Self {
-        Rect {
-            width,
-            height,
-            x: 0,
-            y: 0
-        }
-    }
-}
-
 pub struct SpriteComponent {
     texture_sheet: String,
     layer: u32,
-    region: Rect,
+    region: sdl2::rect::Rect,
     scale_x: u32,
     scale_y: u32,
     flip_horizontal: bool,
@@ -104,7 +85,7 @@ impl SpriteComponent {
         &self.texture_sheet
     }
 
-    pub fn region(&self) -> Rect {
+    pub fn region(&self) -> sdl2::rect::Rect {
         self.region
     }
 
@@ -120,7 +101,7 @@ impl SpriteComponent {
         (self.flip_horizontal, self.flip_vertical)
     }
 
-    pub fn set_region(&mut self, region: Rect) -> &mut Self{
+    pub fn set_region(&mut self, region: sdl2::rect::Rect) -> &mut Self{
         self.region = region;
         self
     }
@@ -149,7 +130,7 @@ impl Default for SpriteComponent {
     fn default() -> Self {
         SpriteComponent {
             texture_sheet: String::new(), 
-            region: Default::default(),
+            region: sdl2::rect::Rect::new(0, 0, 0, 0),
             scale_x: 1,
             scale_y: 1,
             layer: 0,
