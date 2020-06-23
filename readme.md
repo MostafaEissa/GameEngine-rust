@@ -14,8 +14,11 @@ In order to compile on Windows, copy all lib files from `lib` directory to
 
 ### Credits:
 
-I took inspiration and learnt a lot from a number of open source projects, specifically,
+All the art work is based on the original YouTube series.
 
+You can download the assets from [the original GitHub repository](https://github.com/carlbirch/BirchEngine/tree/master/BirchEngine/assets)
+
+I took inspiration and learnt a lot from a number of open source projects, specifically,
 
 - [rustic-ecs](https://github.com/AndyBarron/rustic-ecs) : 
 Simple entity-component system in Rust
