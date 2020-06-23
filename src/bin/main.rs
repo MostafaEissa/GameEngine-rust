@@ -34,11 +34,20 @@ fn main() {
 	.add_animation("Walk", 1, 8, 100)
 	.play("Idle", false, false);
 
-	for tile in game_engine::game::Map::load_map("assets/map.map", 25, 20) {
+	let (tiles, terrain) =  game_engine::game::Map::load_map("assets/map.map", 25, 20);
+
+	for tile in tiles {
 		let tile_entity = world.create_entity();
 		world.add_component::<SpriteComponent>(tile_entity).set_texture(tile.texture_sheet).set_layer(MAP_LAYER).set_region(tile.src_rect).set_scale(2, 2);
 		world.add_component::<PositionComponent>(tile_entity).set_position(Vector2D::new(tile.pos_x as f32, tile.pos_y as f32));
 		world.add_component::<VelocityComponent>(tile_entity);
+	}
+
+	for tile in terrain {
+		let tile_entity = world.create_entity();
+		world.add_component::<PositionComponent>(tile_entity).set_position(Vector2D::new(tile.pos_x as f32, tile.pos_y as f32));
+		world.add_component::<VelocityComponent>(tile_entity);
+		world.add_component::<CollisionComponent>(tile_entity).set_width(tile.src_rect.w as u32).set_height(tile.src_rect.h as u32).set_tag("terrain");
 	}
 	
 	// keyboard resource

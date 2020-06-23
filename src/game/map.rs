@@ -9,11 +9,12 @@ pub struct Tile {
     pub pos_y: u32
 }
 
+
 pub struct Map;
 
 impl Map {
 
-    pub fn load_map(path: &str, size_x: usize, size_y: usize) -> Vec<Tile> {
+    pub fn load_map(path: &str, size_x: usize, size_y: usize) -> (Vec<Tile>, Vec<Tile>) {
         
         let mut map: Vec<Tile> = vec![];
         let mut file = File::open(path).unwrap();
@@ -35,6 +36,26 @@ impl Map {
                     });
                 }
         }
-        map
+
+        let mut colliders = vec![];
+        let rows = &rows[size_y+1..];
+        for row in 0..size_y {
+            let tiles: Vec<_> = rows[row].split(',').collect();
+            for column in 0..size_x {
+                let position = tiles[column].parse::<i32>().unwrap();
+                if position == 1 {
+                    colliders.push (
+                        Tile {
+                            texture_sheet: "",
+                            src_rect: sdl2::rect::Rect::new(0, 0, 32, 32),
+                            pos_x: column as u32 * 64,
+                            pos_y: row as u32* 64
+                        }
+                    );
+                }
+            }
+        }
+
+        (map, colliders)
     }
 }

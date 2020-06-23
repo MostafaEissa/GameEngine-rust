@@ -12,44 +12,55 @@ impl<'a> System<'a> for PhysicsSystem {
         let mut poss: Vec<_> = positions.into_iter().collect();
         let mut vels: Vec<_> = velocities.into_iter().collect();
 
-    
+        //update position
+        let mut player_pos = poss[0].position();
+
+        for ((pos, vel), sprt) in poss.iter_mut().zip(vels.iter_mut()).zip(bounding_boxes.iter()) {
+            let old_pos = pos.position();
+            pos.set_position(old_pos + vel.velocity());
+
+            if sprt.tag() == "player" {
+                player_pos = old_pos;
+            }
+
+            camera.x = pos.position().x() as i32 - 400;
+            camera.y = pos.position().y() as i32 - 320;
+            if camera.x < 0 {
+                camera.x = 0;
+            }
+            if camera.y < 0 {
+                camera.y = 0;
+            }
+            if camera.x > camera.w as i32{
+                camera.x = camera.w as i32;
+            }
+            if camera.y > camera.h as i32 {
+                camera.y = camera.h as i32;
+            }
+        
+        }   
+        let mut move_player_back = false;
+
         // detect collitions
         for (i, ((pos_a, sprite_a), _vel_a)) in poss.iter().zip(bounding_boxes.iter()).zip(vels.iter_mut()).enumerate() {
             for  (j, (pos_b, sprite_b)) in poss.iter().zip(bounding_boxes.iter()).enumerate() {
                 
-                if i == j {continue;}
+                if i == j || sprite_a.tag() != "player" {continue;}
 
                 let box_a = sdl2::rect::Rect::new(pos_a.position().x() as i32, pos_a.position().y() as i32, sprite_a.width(), sprite_a.height());
                 let box_b = sdl2::rect::Rect::new(pos_b.position().x() as i32, pos_b.position().y() as i32, sprite_b.width(), sprite_b.height());
         
                 if CollisionDetector::aabb(&box_a, &box_b) {
-                    println!("collision between {} and {}", sprite_a.tag(), sprite_b.tag());
+                    move_player_back = true;
                 }
             }
         }
     
-        //update position
-
-        for (pos, vel) in poss.iter_mut().zip(vels.iter_mut()) {
-                let old_pos = pos.position();
-                pos.set_position(old_pos + vel.velocity());
-
-                camera.x = pos.position().x() as i32 - 400;
-                camera.y = pos.position().y() as i32 - 320;
-                if camera.x < 0 {
-                    camera.x = 0;
-                }
-                if camera.y < 0 {
-                    camera.y = 0;
-                }
-                if camera.x > camera.w as i32{
-                    camera.x = camera.w as i32;
-                }
-                if camera.y > camera.h as i32 {
-                    camera.y = camera.h as i32;
-                }
-            
+        if move_player_back {
+            let player =  poss.iter_mut().zip(bounding_boxes.iter()).filter(|item| item.1.tag() == "player").nth(0).unwrap();
+            player.0.set_position(player_pos);
         }
+    
         
     }
 }
