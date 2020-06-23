@@ -2,7 +2,7 @@
 
 This is my implementation of a 2D game engine in Rust based on the video series [How To Make A Game In C++ & SDL2 From Scratch!](https://www.youtube.com/playlist?list=PLhfAbcv9cehhkG7ZQK0nfIGJC_C-wSLrx)  by [carlbirch](https://github.com/carlbirch)
 
-![screenshot](screenshot.PNG) 
+<img src="https://raw.githubusercontent.com/MostafaEissa/GameEngine-rust/master/screenshot.png" data-canonical-src="https://raw.githubusercontent.com/MostafaEissa/GameEngine-rust/master/screenshot.png" height="350" />
 
 ### Notes:
 
